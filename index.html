@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="WebGIS Analisis Spasial Tingkat Kerawanan Banjir di Kota Sorong menggunakan pendekatan Multi-Parameter berbasis GIS">
+  <meta name="keywords" content="WebGIS, Kerawanan Banjir, Kota Sorong, GIS, Analisis Spasial">
+  <title>WebGIS Kerawanan Banjir Kota Sorong</title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="css/styles.css">
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+  <!-- Leaflet Fullscreen CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.fullscreen/3.0.2/Control.FullScreen.min.css" />
+
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌊</text></svg>">
+</head>
+<body>
+
+  <!-- ============ NAVBAR ============ -->
+  <nav class="navbar" id="navbar">
+    <a href="index.html" class="navbar-brand">
+      <span class="brand-icon">🌊</span>
+      <span>GIS Banjir Sorong</span>
+    </a>
+    <ul class="navbar-nav" id="navMenu">
+      <li><a href="index.html" class="active" id="nav-home">Beranda</a></li>
+      <li><a href="pages/map.html" id="nav-map">🗺️ Peta</a></li>
+      <li><a href="pages/methodology.html" id="nav-method">Metodologi</a></li>
+      <li><a href="pages/about.html" id="nav-about">Tentang</a></li>
+    </ul>
+    <button class="mobile-toggle" id="mobileToggle" aria-label="Toggle menu">☰</button>
+  </nav>
+
+  <!-- ============ HERO SECTION ============ -->
+  <section class="hero" id="hero">
+    <div class="hero-bg">
+      <div class="grid-pattern"></div>
+    </div>
+    <div class="hero-content">
+      <div class="hero-badge">
+        <span class="dot"></span>
+        Analisis Spasial Berbasis GIS
+      </div>
+      <h1>
+        Tingkat Kerawanan<br>
+        <span class="highlight">Banjir di Kota Sorong</span>
+      </h1>
+      <p>
+        Visualisasi hasil analisis spasial menggunakan pendekatan Multi-Parameter
+        untuk memetakan tingkat kerawanan banjir di seluruh wilayah Kota Sorong,
+        Papua Barat Daya.
+      </p>
+      <div class="hero-actions">
+        <a href="pages/map.html" class="btn btn-primary">
+          🗺️ Lihat Peta Interaktif
+        </a>
+        <a href="pages/methodology.html" class="btn btn-outline">
+          📖 Metodologi Penelitian
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ STATISTICS SECTION ============ -->
+  <section class="stats-section" id="stats">
+    <div class="section-header fade-in">
+      <span class="label">Statistik Kerawanan</span>
+      <h2>Distribusi Tingkat Kerawanan Banjir</h2>
+      <p>Klasifikasi wilayah berdasarkan hasil analisis multi-parameter GIS</p>
+    </div>
+
+    <div class="stats-grid fade-in" id="statsGrid">
+      <div class="stat-card rendah">
+        <div class="stat-icon">🟩</div>
+        <div class="stat-value" id="stat-r">-</div>
+        <div class="stat-label">Rendah</div>
+        <div class="stat-detail" id="stat-r-pct">-</div>
+      </div>
+      <div class="stat-card sedang">
+        <div class="stat-icon">🟡</div>
+        <div class="stat-value" id="stat-s">-</div>
+        <div class="stat-label">Sedang</div>
+        <div class="stat-detail" id="stat-s-pct">-</div>
+      </div>
+      <div class="stat-card tinggi">
+        <div class="stat-icon">🟠</div>
+        <div class="stat-value" id="stat-t">-</div>
+        <div class="stat-label">Tinggi</div>
+        <div class="stat-detail" id="stat-t-pct">-</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CHARTS SECTION ============ -->
+  <section class="stats-section">
+    <div class="section-header fade-in">
+      <span class="label">Visualisasi Data</span>
+      <h2>Grafik Distribusi Kerawanan</h2>
+      <p>Perbandingan jumlah area dan persentase setiap tingkat kerawanan banjir</p>
+    </div>
+
+    <div class="charts-container fade-in">
+      <div class="chart-card">
+        <h4>📊 Distribusi Per Kategori</h4>
+        <div class="chart-wrapper">
+          <canvas id="barChart"></canvas>
+        </div>
+      </div>
+      <div class="chart-card">
+        <h4>🍩 Persentase Kerawanan</h4>
+        <div class="chart-wrapper">
+          <canvas id="doughnutChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CTA SECTION ============ -->
+  <section class="stats-section">
+    <div class="section-header fade-in">
+      <span class="label">Eksplorasi</span>
+      <h2>Jelajahi Peta Interaktif</h2>
+      <p>Lihat seluruh layer GIS secara interaktif, klik polygon untuk detail informasi, dan filter berdasarkan kategori kerawanan</p>
+    </div>
+    <div style="text-align: center;" class="fade-in">
+      <a href="pages/map.html" class="btn btn-primary" style="font-size: 1.05rem; padding: 1rem 2.5rem;">
+        🗺️ Buka Peta Interaktif
+      </a>
+    </div>
+  </section>
+
+  <!-- ============ FOOTER ============ -->
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-text">
+        © 2026 WebGIS Kerawanan Banjir Kota Sorong — Analisis & Pemodelan Spasial
+      </div>
+      <div class="footer-links">
+        <a href="pages/methodology.html">Metodologi</a>
+        <a href="pages/about.html">Tentang</a>
+        <a href="pages/map.html">Peta</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

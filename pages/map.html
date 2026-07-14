@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Peta Interaktif Kerawanan Banjir Kota Sorong - Visualisasi GIS multi-layer">
+  <title>Peta Interaktif — WebGIS Kerawanan Banjir Kota Sorong</title>
+
+  <link rel="stylesheet" href="../css/styles.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.fullscreen/3.0.2/Control.FullScreen.min.css" />
+  
+  <!-- Turf.js for Spatial Math -->
+  <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
+
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌊</text></svg>">
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar" id="navbar">
+    <a href="../index.html" class="navbar-brand">
+      <span class="brand-icon">🌊</span>
+      <span>GIS Banjir Sorong</span>
+    </a>
+    <ul class="navbar-nav" id="navMenu">
+      <li><a href="../index.html">Beranda</a></li>
+      <li><a href="map.html" class="active">🗺️ Peta</a></li>
+      <li><a href="methodology.html">Metodologi</a></li>
+      <li><a href="about.html">Tentang</a></li>
+    </ul>
+    <button class="mobile-toggle" id="mobileToggle" aria-label="Toggle menu">☰</button>
+  </nav>
+
+  <!-- MAP PAGE LAYOUT -->
+  <div class="map-page">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <h3>🎛️ Panel Kontrol</h3>
+        <button class="btn-icon" id="closeSidebar" title="Tutup sidebar">✕</button>
+      </div>
+
+      <div class="sidebar-content">
+
+        <!-- Search / Location -->
+        <div class="sidebar-section">
+          <div class="sidebar-section-title">Pilih Distrik (Navigasi)</div>
+          <select class="filter-select" id="filterLokasi">
+            <option value="">-- Pilih Distrik Kota Sorong --</option>
+            <option value="-0.8700,131.2500">Distrik Sorong</option>
+            <option value="-0.8800,131.2200">Distrik Sorong Barat</option>
+            <option value="-0.8900,131.2000">Distrik Sorong Kepulauan</option>
+            <option value="-0.8900,131.2800">Distrik Sorong Timur</option>
+            <option value="-0.8500,131.2700">Distrik Sorong Utara</option>
+            <option value="-0.8900,131.2600">Distrik Sorong Manoi</option>
+            <option value="-0.8800,131.2500">Distrik Sorong Kota</option>
+            <option value="-0.8600,131.2800">Distrik Malaimsimsa</option>
+            <option value="-0.8800,131.3000">Distrik Klaurung</option>
+            <option value="-0.8400,131.2400">Distrik Maladum Mes</option>
+          </select>
+        </div>
+
+        <!-- Filter Kerawanan -->
+        <div class="sidebar-section">
+          <div class="sidebar-section-title">Tingkat Kerawanan (Skor)</div>
+          <select class="filter-select" id="filterKerawanan">
+            <option value="">Semua Skor</option>
+            <option value="Rendah">Skor 1 (Rendah)</option>
+            <option value="Sedang">Skor 2 (Sedang)</option>
+            <option value="Tinggi">Skor 3 (Tinggi)</option>
+          </select>
+        </div>
+
+        <!-- Layer Control -->
+        <div class="sidebar-section">
+          <div class="sidebar-section-title">Layer</div>
+          <div id="layerControls">
+            <label class="layer-item">
+              <input type="checkbox" id="layer-kerawanan" checked>
+              <span class="layer-color" style="background: linear-gradient(135deg, #006400, #FF0000);"></span>
+              <span>Kerawanan Banjir</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Basemap -->
+        <div class="sidebar-section">
+          <div class="sidebar-section-title">Basemap</div>
+          <div class="basemap-selector">
+            <button class="basemap-btn active" data-basemap="osm">🗺️ OpenStreetMap</button>
+            <button class="basemap-btn" data-basemap="satellite">🛰️ Satelit</button>
+            <button class="basemap-btn" data-basemap="topo">⛰️ Topografi</button>
+          </div>
+        </div>
+
+        <!-- Legend -->
+        <div class="sidebar-section">
+          <div class="sidebar-section-title">Tingkat Kerawanan</div>
+          <div id="legend">
+            <div class="legend-item">
+              <span class="legend-color" style="background: #32CD32;"></span>
+              <span>Rendah</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-color" style="background: #FFD700;"></span>
+              <span>Sedang</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-color" style="background: #FF8C00;"></span>
+              <span>Tinggi</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Statistics summary -->
+        <div class="sidebar-section">
+          <div class="sidebar-section-title">Statistik</div>
+          <div id="sidebarStats" style="font-size: 0.8rem; color: var(--text-secondary);">
+            <p>Memuat data...</p>
+          </div>
+        </div>
+
+      </div>
+    </aside>
+
+    <!-- Sidebar toggle -->
+    <button class="sidebar-toggle" id="sidebarToggle" title="Toggle sidebar">◀</button>
+
+    <!-- MAP CONTAINER -->
+    <div class="map-container">
+      <!-- Loading overlay -->
+      <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Memuat data GeoJSON...</div>
+      </div>
+
+      <!-- Map -->
+      <div id="map"></div>
+
+      <!-- Coordinate display -->
+      <div class="coordinate-display" id="coordDisplay">
+        Lat: -0.8800 | Lng: 131.2500
+      </div>
+
+      <!-- Info Panel -->
+      <div class="info-panel" id="infoPanel">
+        <div class="info-panel-header">
+          <h4 id="infoPanelTitle">Informasi Area</h4>
+          <button class="info-panel-close" id="infoPanelClose">✕</button>
+        </div>
+        <div id="infoPanelContent">
+          <!-- Filled dynamically -->
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.fullscreen/3.0.2/Control.FullScreen.min.js"></script>
+  <script src="../js/map.js"></script>
+</body>
+</html>
